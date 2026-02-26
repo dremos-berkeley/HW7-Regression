@@ -126,10 +126,16 @@ class LogisticRegressor(BaseRegressor):
         Arguments: 
             X (np.ndarray): Matrix of feature values.
 
-        Returns: 
+        Returns:
             The predicted labels (y_pred) for given X.
         """
-        pass
+        # linear combination of features and weights
+        z = np.dot(X, self.W)
+
+        # apply sigmoid function to squash output between 0 and 1
+        y_pred = 1 / (1 + np.exp(-z))
+
+        return y_pred
     
     def loss_function(self, y_true, y_pred) -> float:
         """
@@ -140,10 +146,17 @@ class LogisticRegressor(BaseRegressor):
             y_true (np.array): True labels.
             y_pred (np.array): Predicted labels.
 
-        Returns: 
+        Returns:
             The mean loss (a single number).
         """
-        pass
+        # small epsilon to avoid log(0) which would give -inf
+        epsilon = 1e-15
+        y_pred = np.clip(y_pred, epsilon, 1 - epsilon)
+
+        # binary cross entropy formula
+        loss = -np.mean(y_true * np.log(y_pred) + (1 - y_true) * np.log(1 - y_pred))
+
+        return loss
         
     def calculate_gradient(self, y_true, X) -> np.ndarray:
         """
@@ -154,7 +167,17 @@ class LogisticRegressor(BaseRegressor):
             y_true (np.array): True labels.
             X (np.ndarray): Matrix of feature values.
 
-        Returns: 
+        Returns:
             Vector of gradients.
         """
-        pass
+        # first get predictions
+        y_pred = self.make_prediction(X)
+
+        # number of samples
+        n = X.shape[0]
+
+        # gradient of binary cross entropy w.r.t. weights
+        # dL/dW = (1/n) * X^T * (y_pred - y_true)
+        gradient = (1 / n) * np.dot(X.T, (y_pred - y_true))
+
+        return gradient

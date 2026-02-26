@@ -35,9 +35,15 @@ def main():
 
     # For testing purposes, once you've added your code.
     # CAUTION: hyperparameters have not been optimized.
-    # log_model = logreg.LogisticRegressor(num_feats=6, learning_rate=0.00001, tol=0.01, max_iter=10, batch_size=10)
-    # log_model.train_model(X_train, y_train, X_val, y_val)
-    # log_model.plot_loss_history()
+    log_model = logreg.LogisticRegressor(num_feats=6, learning_rate=0.01, tol=0.0001, max_iter=100, batch_size=10)
+    log_model.train_model(X_train, y_train, X_val, y_val)
+    log_model.plot_loss_history()
+
+    import numpy as np
+    X_val_padded = np.hstack([X_val, np.ones((X_val.shape[0], 1))])
+    y_pred = (log_model.make_prediction(X_val_padded) >= 0.5).astype(int)
+    accuracy = np.mean(y_pred == y_val)
+    print(f'Validation accuracy: {accuracy:.2%}')
 
 # Run main function if run as script
 if __name__ == "__main__":
